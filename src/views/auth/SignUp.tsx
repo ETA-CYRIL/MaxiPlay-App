@@ -56,6 +56,8 @@ const SignUp: FC<Props> = props => {
     values: NewUser,
     actions: FormikHelpers<NewUser>,
   ) => {
+    actions.setSubmitting(true);
+
     try {
       // console.log('Submitting values:', values);
       // i want to send this information to out API
@@ -70,6 +72,7 @@ const SignUp: FC<Props> = props => {
         console.log('❌ Network/Other Error:', error.message);
       }
     }
+    actions.setSubmitting(false);
   };
 
   return (

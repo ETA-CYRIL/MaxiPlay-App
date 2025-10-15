@@ -8,6 +8,8 @@ import AppLink from '@ui/AppLink';
 import AuthFormContainer from '@components/AuthFormContainer';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { AuthStackParamList } from 'src/@types/navigation';
+import { FormikHelpers } from 'formik';
+import client from 'src/api/client';
 
 const lostPasswordSchema = yup.object({
   email: yup
@@ -18,17 +20,41 @@ const lostPasswordSchema = yup.object({
 });
 interface Props {}
 
+interface InitailValue {
+  email: string;
+}
 const initialValues = {
   email: '',
 };
+
+  const handleSubmit = async (
+    values: InitailValue,
+    actions: FormikHelpers<InitailValue>,
+  ) => {
+    actions.setSubmitting(true);
+
+    try {
+      // console.log('Submitting values:', values);
+      // i want to send this information to out API
+      const { data } = await client.post('auth/forget-password', { ...values });
+      console.log(data);
+    } catch (error: any) {
+      if (error.response) {
+        console.log('❌ Server Error:', error.response.data);
+        console.log('Status:', error.response.status);
+      } else {
+        console.log('❌ Network/Other Error forget-password:', error.message);
+      }
+    }
+    actions.setSubmitting(false);
+  };
+
 const LostPassword: FC<Props> = props => {
   const navigation = useNavigation<NavigationProp<AuthStackParamList>>();
 
   return (
     <Form
-      onSubmit={values => {
-        console.log(values);
-      }}
+      onSubmit={handleSubmit}
       initialValues={initialValues}
       validationSchema={lostPasswordSchema}
     >
@@ -48,12 +74,18 @@ const LostPassword: FC<Props> = props => {
 
           <SubmitBtn title="Send Link" />
           <View style={styles.linkContainer}>
-            <AppLink title="Sign In"   onPress={() => {
+            <AppLink
+              title="Sign In"
+              onPress={() => {
                 navigation.navigate('SignIn');
-              }}/>
-            <AppLink title="Sign Up"   onPress={() => {
+              }}
+            />
+            <AppLink
+              title="Sign Up"
+              onPress={() => {
                 navigation.navigate('SignUp');
-              }}/>
+              }}
+            />
           </View>
         </View>
       </AuthFormContainer>

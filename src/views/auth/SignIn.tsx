@@ -48,6 +48,8 @@ const SignIn: FC<Props> = props => {
     values: SignInUserInfos,
     actions: FormikHelpers<SignInUserInfos>,
   ) => {
+    actions.setSubmitting(true);
+
     try {
       // console.log('Submitting values:', values);
       // i want to send this information to out API
@@ -61,6 +63,7 @@ const SignIn: FC<Props> = props => {
         console.log('❌ Network/Other Error sign-in:', error.message);
       }
     }
+    actions.setSubmitting(false);
   };
   return (
     <Form
