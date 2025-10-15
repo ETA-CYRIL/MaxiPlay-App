@@ -7,16 +7,21 @@ import OTPField from '@ui/OTPField';
 import AppButton from '@ui/AppButton';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { AuthStackParamList } from 'src/@types/navigation';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import client from 'src/api/client';
 
-interface Props {}
+type Props = NativeStackScreenProps<AuthStackParamList, 'Verification'>;
 
 const otpFields = new Array(6).fill('');
 
-const Verification: FC<Props> = props => {
+const Verification: FC<Props> = ({ route }) => {
+ 
+  const navigation = useNavigation<NavigationProp<AuthStackParamList>>();
+
   const [otp, setOtp] = useState([...otpFields]);
   const [activeOtpIndex, setActiveOtpIndex] = useState(0);
 
-  const navigation = useNavigation<NavigationProp<AuthStackParamList>>();
+  const { userInfo } = route.params;
 
   const inputRef = useRef<TextInput>(null);
 
@@ -40,6 +45,30 @@ const Verification: FC<Props> = props => {
       Keyboard.dismiss();
       const newOtp = value.split('');
       setOtp([...newOtp]);
+    }
+  };
+
+  const isValidOtp = otp.every(value => {
+    return value.trim();
+  });
+
+  const handleSubmit = async () => {
+    if (!isValidOtp) return;
+
+    try {
+      const { data } = await client.post('auth/verify-email', {
+        userId: userInfo.id,
+        token: otp.join(''),
+      });
+      console.log(data);
+      navigation.navigate('SignIn');
+    } catch (error: any) {
+      if (error.response) {
+        console.log('❌ Server Error:', error.response.data);
+        console.log('Status:', error.response.status);
+      } else {
+        console.log('❌ Network/Other Error:', error.message);
+      }
     }
   };
 
@@ -67,12 +96,7 @@ const Verification: FC<Props> = props => {
         })}
       </View>
 
-      <AppButton
-        title="Submit"
-        onPress={() => {
-          navigation.navigate('SignIn');
-        }}
-      />
+      <AppButton title="Submit" onPress={handleSubmit} />
       <View style={styles.linkContainer}>
         <AppLink title="Resend OTP" />
       </View>

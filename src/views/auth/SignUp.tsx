@@ -1,6 +1,6 @@
 import AuthInputField from '@components/form/AuthInputField';
 import Form from '@components/form';
-import { Formik, useFormikContext } from 'formik';
+import { Formik, FormikHelpers, useFormikContext } from 'formik';
 import { FC, useState } from 'react';
 import { TextInput, View, Text, StyleSheet, Button, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -11,6 +11,7 @@ import AppLink from '@ui/AppLink';
 import AuthFormContainer from '@components/AuthFormContainer';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { AuthStackParamList } from 'src/@types/navigation';
+import client from 'src/api/client';
 
 const signUpSchema = yup.object({
   name: yup
@@ -31,6 +32,12 @@ const signUpSchema = yup.object({
 });
 interface Props {}
 
+export interface NewUser {
+  name: string;
+  email: string;
+  password: string;
+}
+
 const initialValues = {
   name: '',
   email: '',
@@ -44,12 +51,30 @@ const SignUp: FC<Props> = props => {
   const togglePasswordView = () => {
     setSecureEntry(!secureEntry);
   };
+
+  const handleSubmit = async (
+    values: NewUser,
+    actions: FormikHelpers<NewUser>,
+  ) => {
+    try {
+      // console.log('Submitting values:', values);
+      // i want to send this information to out API
+      const { data } = await client.post('auth/create', { ...values });
+      navigation.navigate('Verification', { userInfo: data.user });
+      // console.log(data);
+    } catch (error: any) {
+      if (error.response) {
+        console.log('❌ Server Error:', error.response.data);
+        console.log('Status:', error.response.status);
+      } else {
+        console.log('❌ Network/Other Error:', error.message);
+      }
+    }
+  };
+
   return (
     <Form
-      onSubmit={values => {
-        console.log(values);
-        navigation.navigate('Verification');
-      }}
+      onSubmit={handleSubmit}
       initialValues={initialValues}
       validationSchema={signUpSchema}
     >

@@ -9,6 +9,8 @@ import AppLink from '@ui/AppLink';
 import AuthFormContainer from '@components/AuthFormContainer';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { AuthStackParamList } from 'src/@types/navigation';
+import { FormikHelpers } from 'formik';
+import client from 'src/api/client';
 
 const signInSchema = yup.object({
   email: yup
@@ -24,6 +26,11 @@ const signInSchema = yup.object({
 });
 interface Props {}
 
+interface SignInUserInfos {
+  email: string;
+  password: string;
+}
+
 const initialValues = {
   email: '',
   password: '',
@@ -36,11 +43,28 @@ const SignIn: FC<Props> = props => {
   const togglePasswordView = () => {
     setSecureEntry(!secureEntry);
   };
+
+  const handleSubmit = async (
+    values: SignInUserInfos,
+    actions: FormikHelpers<SignInUserInfos>,
+  ) => {
+    try {
+      // console.log('Submitting values:', values);
+      // i want to send this information to out API
+      const { data } = await client.post('auth/sign-in', { ...values });
+      console.log(data);
+    } catch (error: any) {
+      if (error.response) {
+        console.log('❌ Server Error:', error.response.data);
+        console.log('Status:', error.response.status);
+      } else {
+        console.log('❌ Network/Other Error sign-in:', error.message);
+      }
+    }
+  };
   return (
     <Form
-      onSubmit={values => {
-        console.log(values);
-      }}
+      onSubmit={handleSubmit}
       initialValues={initialValues}
       validationSchema={signInSchema}
     >
