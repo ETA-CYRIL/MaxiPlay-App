@@ -1,7 +1,7 @@
 import colors from '@utils/colors';
 import { FC } from 'react';
 import { View, Pressable, StyleSheet, Text } from 'react-native';
-import Loader from './loader';
+import Loader from './Loader';
 
 
 interface Props {

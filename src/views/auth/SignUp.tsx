@@ -69,7 +69,7 @@ const SignUp: FC<Props> = props => {
         console.log('❌ Server Error:', error.response.data);
         console.log('Status:', error.response.status);
       } else {
-        console.log('❌ Network/Other Error:', error.message);
+        console.log('❌ Network/Other Error Sign Up:', error.message);
       }
     }
     actions.setSubmitting(false);

@@ -12,7 +12,7 @@ interface Props {
   color?: string;
 }
 
-const loader: FC<Props> = ({ color = colors.CONTRAST }) => {
+const Loader: FC<Props> = ({ color = colors.CONTRAST }) => {
   const initialRotation = useSharedValue(0);
 
   const transform = useAnimatedStyle(() => {
@@ -32,4 +32,4 @@ const loader: FC<Props> = ({ color = colors.CONTRAST }) => {
   );
 };
 
-export default loader;
+export default Loader;
